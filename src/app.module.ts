@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { PingController } from './app.controller';
 import { AuthModule } from './components/auth/auth.module';
 import { UsersModule } from './components/users/users.module';
-import { ConfigModule } from '@nestjs/config';
-import configuration from './configuration/main';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import configuration from './configuration/config';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import configuration from './configuration/main';
       load: [configuration],
       cache: true,
     }),
+    LoggerModule.forRoot({ ...configuration().pino }),
     AuthModule,
     UsersModule,
   ],
