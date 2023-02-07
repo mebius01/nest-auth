@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger } from 'nestjs-pino';
+import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 
 import { ConfigService } from '@nestjs/config';
 
@@ -13,6 +13,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix(PREFIX);
   app.useLogger(app.get(Logger));
+  app.useGlobalInterceptors(new LoggerErrorInterceptor());
 
   await app.listen(PORT, () => {
     console.log(
