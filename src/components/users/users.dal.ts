@@ -1,13 +1,14 @@
 import { Injectable } from "@nestjs/common";
-import { UpdateUsersDto } from "./users.dto";
-import { UsersDal } from "./users.dal";
+import { UsersDto } from "./users.dto";
+import { UsersMapper } from "src/database/mapper";
+import { TUser } from "src/database/types";
 
 @Injectable()
-export class UsersService {
-  constructor(private readonly usersDal: UsersDal) {}
-  async list() {
+export class UsersDal {
+  constructor(private readonly usersMapper: UsersMapper) {}
+  async list(): Promise<TUser[]> {
     try {
-      const data = await this.usersDal.list();
+      const data = await this.usersMapper.list();
       return data;
     } catch (error) {
       throw new Error(error);
@@ -18,7 +19,7 @@ export class UsersService {
     return `This action returns a #${id} user`;
   }
 
-  update(id: string, user: UpdateUsersDto) {
+  update(id: string, user: UsersDto) {
     return `This action updates a #${id} user`;
   }
 
