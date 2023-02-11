@@ -2,6 +2,9 @@
 /dist
 /node_modules
 
+# examle file
+examle.ts
+
 # Logs
 logs
 *.log

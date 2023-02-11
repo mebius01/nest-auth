@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { UsersMapper } from "../../database/mapper";
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { AuthLocalDto, CreateAuthDto } from "./auth.dto";
+import * as bcrypt from "bcrypt";
+import { UsersDto } from "../users/users.dto";
+import ID from "../../utils/id";
+import { AuthDal } from "./auth.dal";
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(private readonly authDal: AuthDal) {}
+  async registration(createAuthDto: CreateAuthDto) {
+    const hash = await bcrypt.hash(createAuthDto.password, 10);
+
+    const user: UsersDto = {
+      id: ID("US"),
+      email: createAuthDto.email,
+      name: createAuthDto.email.split("@")[0],
+      user_role_id: 1,
+    };
+
+    const authLocal: AuthLocalDto = {
+      password_hash: hash,
+      user_id: user.id,
+    };
+    const data = await this.authDal.registration(user, authLocal);
+    return data;
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  async login(createAuthDto: CreateAuthDto) {
+    const init = await this.authDal.login({ email: createAuthDto.email });
+    if (!init) throw new UnauthorizedException();
+    const hash = await bcrypt.compare(createAuthDto.password, init.password_hash);
+    if (!hash) throw new UnauthorizedException();
+    //! logic for session
+    const { password_hash, ...user } = init;
+    return user;
   }
 }
