@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { UsersDto } from "./users.dto";
+import { UpdateUsersDto, UsersDto } from "./users.dto";
 import { UsersMapper } from "src/database/mapper";
-import { TUser } from "src/database/types";
+import { TUser } from "src/types/users.type";
 
 @Injectable()
 export class UsersDal {
@@ -15,15 +15,34 @@ export class UsersDal {
     }
   }
 
-  get(id: string) {
-    return `This action returns a #${id} user`;
+  async get(id: string): Promise<TUser> {
+    try {
+      type TUserId = Omit<TUser, "email" | "name" | "user_role_id">;
+      const data = await this.usersMapper.get<TUserId, TUser>({ id });
+      return data;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  update(id: string, user: UsersDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, user: UpdateUsersDto): Promise<TUser> {
+    try {
+      const data = await this.usersMapper.update<{ id: string }, { name: string }, TUser>(
+        { id },
+        { name: user.name }
+      );
+      return data;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  delete(id: string) {
-    return `This action deletes a #${id} user`;
+  async delete(id: string): Promise<TUser> {
+    try {
+      const data = await this.usersMapper.delete<{ id: string }, TUser>({ id });
+      return data;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }

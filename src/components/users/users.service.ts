@@ -1,11 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { UpdateUsersDto } from "./users.dto";
 import { UsersDal } from "./users.dal";
+import { TUser } from "src/types/users.type";
 
 @Injectable()
 export class UsersService {
   constructor(private readonly usersDal: UsersDal) {}
-  async list() {
+  async list(): Promise<TUser[]> {
     try {
       const data = await this.usersDal.list();
       return data;
@@ -14,15 +15,30 @@ export class UsersService {
     }
   }
 
-  get(id: string) {
-    return `This action returns a #${id} user`;
+  async get(id: string): Promise<TUser> {
+    try {
+      const data = await this.usersDal.get(id);
+      return data;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  update(id: string, user: UpdateUsersDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, user: UpdateUsersDto): Promise<TUser> {
+    try {
+      const data = await this.usersDal.update(id, user);
+      return data;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 
-  delete(id: string) {
-    return `This action deletes a #${id} user`;
+  async delete(id: string): Promise<TUser> {
+    try {
+      const data = await this.usersDal.delete(id);
+      return data;
+    } catch (error) {
+      throw new Error(error);
+    }
   }
 }

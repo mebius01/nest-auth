@@ -1,9 +1,9 @@
-import { TEmail, TUserIdAuthLocal } from "./types";
 import { AuthLocalMapper, UsersMapper } from "../../database/mapper";
 import { Injectable } from "@nestjs/common";
 import { AuthLocalDto } from "./auth.dto";
 import { UsersDto } from "../users/users.dto";
-import { TAuthLocal, TUser } from "src/database/types";
+import { TUser } from "src/types/users.type";
+import { TAuthLocal } from "src/types/auth.type";
 
 @Injectable()
 export class AuthDal {
@@ -18,9 +18,9 @@ export class AuthDal {
     return data;
   }
 
-  async login(email: TEmail) {
-    const user = await this.usersMapper.get<TEmail, TUser>(email);
-    const auth = await this.authLocalMapper.get<TUserIdAuthLocal, TAuthLocal>({
+  async login(email: { email: string }) {
+    const user = await this.usersMapper.get<{ email: string }, TUser>(email);
+    const auth = await this.authLocalMapper.get<{ user_id: string }, TAuthLocal>({
       user_id: user.id,
     });
     const data = { ...user, password_hash: auth.password_hash };
