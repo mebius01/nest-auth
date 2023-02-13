@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
-import { UpdateUsersDto } from "./users.dto";
-import { UsersDal } from "./users.dal";
+import { UpdateUsersDto, UsersDto } from "./users.dto";
+import { UsersMapper } from "src/database/mapper";
 import { TUser } from "src/types/users.type";
 
 @Injectable()
-export class UsersService {
-  constructor(private readonly usersDal: UsersDal) {}
+export class UsersDal {
+  constructor(private readonly usersMapper: UsersMapper) {}
   async list(): Promise<TUser[]> {
     try {
-      const data = await this.usersDal.list();
+      const data = await this.usersMapper.list();
       return data;
     } catch (error) {
       throw new Error(error);
@@ -17,7 +17,8 @@ export class UsersService {
 
   async get(id: string): Promise<TUser> {
     try {
-      const data = await this.usersDal.get(id);
+      type TUserId = Omit<TUser, "email" | "name" | "user_role_id">;
+      const data = await this.usersMapper.get<TUserId, TUser>({ id });
       return data;
     } catch (error) {
       throw new Error(error);
@@ -26,7 +27,10 @@ export class UsersService {
 
   async update(id: string, user: UpdateUsersDto): Promise<TUser> {
     try {
-      const data = await this.usersDal.update(id, user);
+      const data = await this.usersMapper.update<{ id: string }, { name: string }, TUser>(
+        { id },
+        { name: user.name }
+      );
       return data;
     } catch (error) {
       throw new Error(error);
@@ -35,7 +39,7 @@ export class UsersService {
 
   async delete(id: string): Promise<TUser> {
     try {
-      const data = await this.usersDal.delete(id);
+      const data = await this.usersMapper.delete<{ id: string }, TUser>({ id });
       return data;
     } catch (error) {
       throw new Error(error);

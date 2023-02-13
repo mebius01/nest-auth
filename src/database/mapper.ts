@@ -1,5 +1,6 @@
-import { TUser, TAuthLocal, TAuthSessions, TUserRole } from "./types";
 import { auth_local, auth_sessions, users, users_role } from "./mock-data";
+import { TAuthLocal, TAuthSessions } from "src/types/auth.type";
+import { TUser, TUserRole } from "src/types/users.type";
 
 interface IMapper<T> {
   table: T[];
@@ -43,7 +44,7 @@ class MapperFileDb<T> implements IMapper<T> {
     return this.table;
   }
 
-  update<P, O>(param: P, payload: O): O {
+  update<P, PL, O>(param: P, payload: PL): O {
     try {
       const original = Object(this.get(param));
       for (const key in original) {
